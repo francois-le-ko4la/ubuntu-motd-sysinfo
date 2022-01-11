@@ -1,0 +1,6 @@
+#!/bin/bash
+export LANG="en_US.UTF-8"
+export PATH="/usr/games:/usr/local/bin:$PATH"
+
+echo
+TERM=linux figlet -f pagga "$(hostname)" | /usr/games/lolcat -f
