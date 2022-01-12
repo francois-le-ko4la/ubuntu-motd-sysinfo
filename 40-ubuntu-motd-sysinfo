@@ -23,7 +23,7 @@ def get_hardware():
     )
     for hw_product in hw_products:
         if os.path.isfile(hw_product):
-            return get_filecontent(hw_product).rstrip('\x00')
+            return get_filecontent(hw_product).rstrip('\x00').rstrip('\n')
 
 def get_secondsToText(secs):
     intervals = (
@@ -57,6 +57,8 @@ def get_kernel():
     return platform.release()
 
 def get_temp():
+    if len(psutil.sensors_temperatures(fahrenheit=False))==0:
+        return 0
     return psutil.sensors_temperatures(fahrenheit=False)['cpu_thermal'][0].current
 
 def get_cpu():
