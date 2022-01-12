@@ -135,11 +135,12 @@ def get_sysinfo():
     result.append(("System load:", "{0:.2f}".format(get_load())))
     for partition in get_diskusage():
         result.append(("Usage of {}:".format(partition['mountpoint']), "{0:.1f}% of {1:.1f}GB".format(partition['percent'],partition['total']) ))
-
     virtual_memory=get_memory()
     result.append(("Memory usage:", "{0:.1f}% of {1:.1f}GB".format(virtual_memory['percent'],virtual_memory['total'])))
     result.append(("Swap usage:", "{0:.1f}%".format(get_swap().percent)))
-    result.append(("Temperature:", "{0:.1f}°C".format(get_temp())))
+    temperature=get_temp()
+    if temperature !=0:
+        result.append(("Temperature:", "{0:.1f}°C".format(temperature)))
     result.append(("Processes:", "{}".format(get_process())))
     result.append(("Users logged in:", "{}".format(get_nbusers())))
     result.append(("Terminal:", get_tty()))
