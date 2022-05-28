@@ -52,8 +52,7 @@ def get_uptime():
 
 def get_distribution():
     os_version=distro.os_release_info()
-    return "{} {} {} ({}/{})".format(platform.system(), os_version.get('pretty_name'), os_version.get('release_codename'), platform.arch
-itecture()[0],platform.machine())
+    return "{} {} {} ({}/{})".format(platform.system(), os_version.get('pretty_name'), os_version.get('release_codename'), platform.architecture()[0], platform.machine())
 
 def get_kernel():
     return platform.release()
@@ -131,8 +130,7 @@ def get_sysinfo():
     result.append(("Uptime:", get_uptime()))
     result.append(("System load:", "{0:.2f}".format(get_load())))
     for partition in get_diskusage():
-        result.append(("Usage of {}:".format(partition['mountpoint']), "{0:.1f}% of {1:.1f}GB".format(partition['percent'],partition['to
-tal']) ))
+        result.append(("Usage of {}:".format(partition['mountpoint']), "{0:.1f}% of {1:.1f}GB".format(partition['percent'],partition['total']) ))
 
     virtual_memory=get_memory()
     result.append(("Memory usage:", "{0:.1f}% of {1:.1f}GB".format(virtual_memory['percent'],virtual_memory['total'])))
