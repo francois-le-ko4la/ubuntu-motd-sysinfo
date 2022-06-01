@@ -18,7 +18,7 @@ def get_filecontent(path):
         return f.read()
 
 def get_hardware():
-    hw_productsi = ('/sys/firmware/devicetree/base/model',
+    hw_products = ('/sys/firmware/devicetree/base/model',
                     '/sys/devices/virtual/dmi/id/product_name')
 
     for hw_product in hw_products:
