@@ -1,5 +1,11 @@
 # ubuntu-motd-sysinfo
+## Why
+Just for fun.
 
+## Result
+![alt text](example.png)
+
+## How to deploy
 ```
 git clone https://github.com/francois-le-ko4la/ubuntu-motd-sysinfo.git
 cd ubuntu-motd-sysinfo/
