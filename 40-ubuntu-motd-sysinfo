@@ -5,6 +5,7 @@ import os
 import sys
 import netifaces
 import time
+import datetime
 import platform
 import distro
 import psutil
@@ -31,20 +32,19 @@ def get_secondsToText(secs):
     remainder = secs
     for name, count in intervals:
         cur_value, remainder = divmod(remainder, count)
-        print("{}{}".format(name, cur_value))
         if cur_value:
             result.append("{} {}{}".format(int(cur_value), name, "s" if cur_value>1 else ""))
     return f"up {', '.join(result)}." if len(result) else "up <1 minute."
 
-def get_monotonic():
-    return time.monotonic()
+def get_seconds_elapsed():
+    return time.time() - psutil.boot_time()
 
 def get_boottime():
     return time.strftime("%Y/%m/%d %H:%M:%S %Z",
                          time.localtime(psutil.boot_time()))
 
 def get_uptime():
-    return "{} ({})".format(get_secondsToText(get_monotonic()),
+    return "{} ({})".format(get_secondsToText(get_seconds_elapsed()),
                             get_boottime())
 
 def get_distribution():
@@ -158,4 +158,3 @@ def print_sysinfo(header, sysinfo):
 
 if __name__ == '__main__':
     print_sysinfo(get_header(), get_sysinfo())
-
