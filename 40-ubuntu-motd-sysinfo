@@ -2,71 +2,88 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 import netifaces
 import time
-import datetime
 import platform
 import distro
 import psutil
 import subprocess
 
+
 def get_header():
-    return "\nSystem information as of {}\n".format(time.asctime(time.localtime(time.time())))
+    return "\nSystem information as of {}\n".format(
+        time.asctime(time.localtime(time.time())))
+
 
 def get_filecontent(path):
     with open(path) as f:
         return f.read()
 
+
 def get_hardware():
     hw_products = ('/sys/firmware/devicetree/base/model',
-                    '/sys/devices/virtual/dmi/id/product_name')
+                   '/sys/devices/virtual/dmi/id/product_name')
 
     for hw_product in hw_products:
         if os.path.isfile(hw_product):
             return get_filecontent(hw_product).rstrip('\x00')
 
-def get_secondsToText(secs):
-    intervals = (('day', 86400), ('hour', 3600), ('minute', 60), ('second', 60))
+
+def get_sec_to_str(secs):
+    intervals = (('day', 86400),
+                 ('hour', 3600),
+                 ('minute', 60))
     result = []
     remainder = secs
     for name, count in intervals:
         cur_value, remainder = divmod(remainder, count)
         if cur_value:
-            result.append("{} {}{}".format(int(cur_value), name, "s" if cur_value>1 else ""))
+            result.append("{} {}{}".format(int(cur_value), name,
+                                           "s" if cur_value > 1 else ""))
     return f"up {', '.join(result)}." if len(result) else "up <1 minute."
+
 
 def get_seconds_elapsed():
     return time.time() - psutil.boot_time()
+
 
 def get_boottime():
     return time.strftime("%Y/%m/%d %H:%M:%S %Z",
                          time.localtime(psutil.boot_time()))
 
+
 def get_uptime():
-    return "{} ({})".format(get_secondsToText(get_seconds_elapsed()),
+    return "{} ({})".format(get_sec_to_str(get_seconds_elapsed()),
                             get_boottime())
+
 
 def get_distribution():
     os_version = distro.os_release_info()
     return "{} {} {} ({}/{})".format(platform.system(),
-            os_version.get('pretty_name'),
-            os_version.get('release_codename'),
-            platform.architecture()[0],platform.machine())
+                                     os_version.get('pretty_name'),
+                                     os_version.get('release_codename'),
+                                     platform.architecture()[0],
+                                     platform.machine())
+
 
 def get_kernel():
     return platform.release()
 
+
 def get_temp():
-    return psutil.sensors_temperatures(fahrenheit=False)['cpu_thermal'][0].current
+    return psutil.sensors_temperatures(
+        fahrenheit=False)['cpu_thermal'][0].current
+
 
 def get_cpu():
     cmd = "lscpu | grep 'Model name:' | head -1 | awk '{print $3}'"
     model = subprocess.getoutput(cmd)
     return "{} / {} Cores".format(model, psutil.cpu_count())
 
+
 def get_nbusers():
     return len(psutil.users())
+
 
 def get_all_ips():
     """
@@ -75,28 +92,32 @@ def get_all_ips():
     ips = {}
     interfaces = netifaces.interfaces()
     for interface in interfaces:
-        #get all ips defined
+        # get all ips defined
         addresses = netifaces.ifaddresses(interface)
-        #test if up/down
-        interface_is_up = netifaces.AF_INET in addresses or netifaces.AF_INET6 in addresses
-        if not interface_is_up or interface=="lo":
+        # test if up/down
+        interface_is_up = (netifaces.AF_INET in addresses or
+                           netifaces.AF_INET6 in addresses)
+        if not interface_is_up or interface == "lo":
             continue
-        #set array
+        # set array
         ips[interface] = []
         for address_family in (netifaces.AF_INET, netifaces.AF_INET6):
             if addresses.get(address_family) is None:
                 continue
             for address in addresses.get(address_family):
                 if '%' in address['addr']:
-                   continue
+                    continue
                 ips[interface].append(address['addr'])
-    return ips 
+    return ips
+
 
 def get_process():
     return len(psutil.pids())
 
+
 def get_load():
     return os.getloadavg()[0]
+
 
 def get_diskusage():
     partitions = psutil.disk_partitions()
@@ -110,51 +131,59 @@ def get_diskusage():
             continue
         result.append({'mountpoint': p.mountpoint,
                        'percent': usage.percent,
-                       'total': usage.total/ 1024 ** 3})
+                       'total': usage.total / 1024 ** 3})
     return result
+
 
 def get_memory():
     virtual_memory = psutil.virtual_memory()
     return {'percent': virtual_memory.percent,
-            'total': virtual_memory.total/ 1024 ** 3}
+            'total': virtual_memory.total / 1024 ** 3}
+
 
 def get_swap():
     return psutil.swap_memory()
 
+
 def get_sysinfo():
-    virtual_memory=get_memory()
-    result=[    ("Product:", get_hardware()),
-                ("CPU:", get_cpu()),
-                ("OS:", get_distribution()),
-                ("Kernel:", get_kernel()),
-                ("Uptime:", get_uptime()),
-                ("System load:", "{0:.2f}".format(get_load()))
-            ]+[ ("Usage of {}:".format(partition['mountpoint']),
-                 "{0:.1f}% of {1:.1f}GB".format(partition['percent'],
-                                                partition['total'])
-                ) for partition in get_diskusage()
-            ]+[ ("Memory usage:",
-                 "{0:.1f}% of {1:.1f}GB".format(virtual_memory['percent'],
-                                                virtual_memory['total'])),
-                ("Swap usage:", "{0:.1f}%".format(get_swap().percent)),
-                ("Temperature:", "{0:.1f}°C".format(get_temp())),
-                ("Processes:", "{}".format(get_process())),
-                ("Users logged in:", "{}".format(get_nbusers()))
-            ]+[ ("{} address for {}:".format(
-                    'IPv4' if '.' in ip else 'IPv6', interface),
-                 "{}".format(ip)
-                ) for interface, ips in get_all_ips().items() for ip in ips
-            ]
+    virtual_memory = get_memory()
+    result = [("Product:", get_hardware()),
+              ("CPU:", get_cpu()),
+              ("OS:", get_distribution()),
+              ("Kernel:", get_kernel()),
+              ("Uptime:", get_uptime()),
+              ("System load:", "{0:.2f}".format(get_load()))
+              ] + \
+             [("Usage of {}:".format(partition['mountpoint']),
+               "{0:.1f}% of {1:.1f}GB".format(partition['percent'],
+                                              partition['total'])
+               ) for partition in get_diskusage()
+              ] + \
+             [("Memory usage:",
+               "{0:.1f}% of {1:.1f}GB".format(
+                   virtual_memory['percent'],
+                   virtual_memory['total'])),
+              ("Swap usage:", "{0:.1f}%".format(get_swap().percent)),
+              ("Temperature:", "{0:.1f}°C".format(get_temp())),
+              ("Processes:", "{}".format(get_process())),
+              ("Users logged in:", "{}".format(get_nbusers()))
+              ] + \
+             [("{} address for {}:".format('IPv4' if '.' in ip else 'IPv6',
+                                           interface), "{}".format(ip))
+              for interface, ips in get_all_ips().items() for ip in ips
+              ]
 
     return result
 
+
 def print_sysinfo(header, sysinfo):
-    max_label_width = len(max(sysinfo, key = lambda s: len(s[0]))[0])
+    max_label_width = len(max(sysinfo, key=lambda s: len(s[0]))[0])
 
     print(header)
     for label, value in sysinfo:
         decor = "  {0:<" + str(max_label_width) + "s} {1}"
         print(decor.format(label, value))
+
 
 if __name__ == '__main__':
     print_sysinfo(get_header(), get_sysinfo())
