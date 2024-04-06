@@ -8,7 +8,7 @@ from termcolor import colored
 
 
 os.environ['TERM'] = 'xterm-256color'
-hostname = socket.gethostname()
+hostname = socket.gethostname().split('.')[0]
 ascii_art = pyfiglet.figlet_format(hostname, font="doom")
 colored_ascii_art = colored(ascii_art, color="cyan")
 print(colored_ascii_art)
