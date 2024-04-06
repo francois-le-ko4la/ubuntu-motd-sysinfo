@@ -8,7 +8,7 @@
 # - python 3.6+
 #
 # USAGE:
-#  sudo curl https://raw.githubusercontent.com/francois-le-ko4la/LABs/master/ransim.sh | sudo sh
+#  sudo curl https://raw.githubusercontent.com/francois-le-ko4la/ubuntu-motd-sysinfo/main/setup_motd.sh | sudo sh
 #
 
 SCRIPT_PATH="/opt/scripts"
