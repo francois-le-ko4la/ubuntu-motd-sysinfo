@@ -11,7 +11,7 @@ to users such as system updates, news, or status information.
 Ubuntu server use the landscape-sysinfo and we want more details and more fun.
 
 ## Result
-![alt text](example.png)
+![alt text](motd_example.png)
 
 ## How to deploy
 ```
