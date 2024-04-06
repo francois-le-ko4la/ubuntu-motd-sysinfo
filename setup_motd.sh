@@ -13,8 +13,8 @@
 
 SCRIPT_PATH="/opt/scripts"
 URL="https://raw.githubusercontent.com/francois-le-ko4la/ubuntu-motd-sysinfo/main"
-PKG="python3-full gcc python3-dev figlet toilet toilet-fonts lolcat"
-LIB="distro distro-info netifaces psutil"
+PKG="python3-full gcc python3-dev"
+LIB="distro distro-info netifaces psutil pyfiglet termcolor"
 
 # Logging function
 log() {
