@@ -1,6 +1,12 @@
-#!/bin/bash
-export LANG="en_US.UTF-8"
-export PATH="/usr/games:/usr/local/bin:$PATH"
+#!/opt/scripts/venv/bin/python3
+# -*- coding: utf-8 -*-
 
-echo
-TERM=linux figlet -f pagga "$(hostname)" | /usr/games/lolcat -f
+import socket
+import pyfiglet
+from termcolor import colored
+
+
+hostname = socket.gethostname()
+ascii_art = pyfiglet.figlet_format(hostname, font="doom")
+colored_ascii_art = colored(ascii_art, color="cyan")
+print(colored_ascii_art)
