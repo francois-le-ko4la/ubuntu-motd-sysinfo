@@ -1,11 +1,13 @@
 #!/opt/scripts/venv/bin/python3
 # -*- coding: utf-8 -*-
 
+import os
 import socket
 import pyfiglet
 from termcolor import colored
 
 
+os.environ['TERM'] = 'xterm-256color'
 hostname = socket.gethostname()
 ascii_art = pyfiglet.figlet_format(hostname, font="doom")
 colored_ascii_art = colored(ascii_art, color="cyan")
