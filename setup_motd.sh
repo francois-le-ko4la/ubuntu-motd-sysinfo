@@ -4,7 +4,7 @@
 # This script sets up a personalized motd on Ubuntu
 #
 # REQUIREMENTS:
-# - Linux platform: Ubuntu 20/04+
+# - Linux platform: Ubuntu 20.04+
 # - python 3.6+
 #
 # USAGE:
@@ -41,34 +41,32 @@ else
     exit 1
 fi
 
-log "Install python3-full..."
-apt-get -yq install $PKG > /dev/null 2>&1
+log "Installing python3-full..."
+sudo apt-get -yq install $PKG > /dev/null 2>&1 || { echo "Installation of python3-full failed."; exit 1; }
 
-log "Create scripts repository..."
+log "Creating scripts repository..."
 mkdir -p $SCRIPT_PATH
-log "Create python venv..."
-python3 -m venv $SCRIPT_PATH/venv > /dev/null 2>&1
-log "Install lib..."
+log "Creating python venv..."
+python3 -m venv $SCRIPT_PATH/venv > /dev/null 2>&1 || { echo "Creation of python venv failed."; exit 1; }
+log "Installing libraries..."
 $SCRIPT_PATH/venv/bin/python -m pip install --upgrade pip > /dev/null 2>&1
-$SCRIPT_PATH/venv/bin/python -m pip install $LIB > /dev/null 2>&1
-log "Download motd files..."
-for file in 00-fprint-hostname 40-ubuntu-motd-sysinfo
-do
-        wget -q -O $SCRIPT_PATH/motd_$file $URL/$file > /dev/null 2>&1
-        chmod +x $SCRIPT_PATH/motd_$file
-        if [ -f "/etc/update-motd.d/$file" ]; then
-                log "File $file exists. Delete $file."
-                rm /etc/update-motd.d/$file
-        fi
-        log "Create link file /etc/update-motd.d/$file"
-        ln -s $SCRIPT_PATH/motd_$file /etc/update-motd.d/$file
+$SCRIPT_PATH/venv/bin/python -m pip install $LIB > /dev/null 2>&1 || { echo "Installation of libraries failed."; exit 1; }
+log "Downloading motd files..."
+for file in 00-fprint-hostname 40-ubuntu-motd-sysinfo; do
+    wget -q -O $SCRIPT_PATH/motd_$file $URL/$file > /dev/null 2>&1 || { echo "Download of $file failed."; exit 1; }
+    chmod +x $SCRIPT_PATH/motd_$file
+    if [ -f "/etc/update-motd.d/$file" ]; then
+        log "File $file exists. Deleting $file."
+        rm /etc/update-motd.d/$file
+    fi
+    log "Creating link file /etc/update-motd.d/$file"
+    ln -s $SCRIPT_PATH/motd_$file /etc/update-motd.d/$file
 done
 
 if [ -f "/etc/update-motd.d/50-landscape-sysinfo" ]; then
     chmod -x /etc/update-motd.d/50-landscape-sysinfo
     log "Permissions changed for /etc/update-motd.d/50-landscape-sysinfo."
 else
-    # Si le fichier n'existe pas, afficher un message d'avertissement
     log "File '/etc/update-motd.d/50-landscape-sysinfo' does not exist. No action taken."
 fi
 
