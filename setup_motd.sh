@@ -23,7 +23,7 @@ log() {
 
 # Check if the platform is Linux
 if [ "$(uname)" != "Linux" ]; then
-    echo "This script only works on Linux systems."
+    log "This script only works on Linux systems."
     exit 1
 fi
 
@@ -33,27 +33,27 @@ if [ -f /etc/os-release ]; then
     if [ "$ID" = "ubuntu" ] && [ "${VERSION_ID%.*}" -ge 20 ]; then
         log "Ubuntu 20.04 or newer detected."
     else
-        echo "Unsupported Ubuntu version. Exiting..."
+        log "Unsupported Ubuntu version. Exiting..."
         exit 1
     fi
 else
-    echo "Unable to detect the operating system."
+    log "Unable to detect the operating system."
     exit 1
 fi
 
 log "Installing python3-full..."
-sudo apt-get -yq install $PKG > /dev/null 2>&1 || { echo "Installation of python3-full failed."; exit 1; }
+sudo apt-get -yq install $PKG > /dev/null 2>&1 || { log "Installation of python3-full failed."; exit 1; }
 
 log "Creating scripts repository..."
 mkdir -p $SCRIPT_PATH
 log "Creating python venv..."
-python3 -m venv $SCRIPT_PATH/venv > /dev/null 2>&1 || { echo "Creation of python venv failed."; exit 1; }
+python3 -m venv $SCRIPT_PATH/venv > /dev/null 2>&1 || { log "Creation of python venv failed."; exit 1; }
 log "Installing libraries..."
 $SCRIPT_PATH/venv/bin/python -m pip install --upgrade pip > /dev/null 2>&1
-$SCRIPT_PATH/venv/bin/python -m pip install $LIB > /dev/null 2>&1 || { echo "Installation of libraries failed."; exit 1; }
+$SCRIPT_PATH/venv/bin/python -m pip install $LIB > /dev/null 2>&1 || { log "Installation of libraries failed."; exit 1; }
 log "Downloading motd files..."
 for file in 00-fprint-hostname 40-ubuntu-motd-sysinfo; do
-    wget -q -O $SCRIPT_PATH/motd_$file $URL/$file > /dev/null 2>&1 || { echo "Download of $file failed."; exit 1; }
+    wget -q -O $SCRIPT_PATH/motd_$file $URL/$file > /dev/null 2>&1 || { log "Download of $file failed."; exit 1; }
     chmod +x $SCRIPT_PATH/motd_$file
     if [ -f "/etc/update-motd.d/$file" ]; then
         log "File $file exists. Deleting $file."
